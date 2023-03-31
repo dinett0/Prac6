@@ -3,12 +3,17 @@ package com.example.prac6_r;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.ContextCompat;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.View;
 
 public class MainActivity extends AppCompatActivity {
@@ -27,11 +32,23 @@ public class MainActivity extends AppCompatActivity {
         //CHECK IF OREO
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             //CHANNEL OBJECT
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
+                            CHANNEL_NAME,
+                            NotificationManager.IMPORTANCE_DEFAULT);
             channel.setDescription(CHANNEL_DESC);
             NotificationManager manager = getSystemService(NotificationManager.class);
             manager.createNotificationChannel(channel);
         }
+
+        if (ContextCompat.checkSelfPermission(this,
+                Settings.ACTION_MANAGE_OVERLAY_PERMISSION) != PackageManager.PERMISSION_GRANTED) {
+            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION
+                    , Uri.parse("package:" + getPackageName()));
+            startActivityForResult(intent, 1);
+        }
+        Intent intent = new Intent(this, MyService.class);
+        startService(intent);
+        stopService(intent);
 
         findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
             @Override
